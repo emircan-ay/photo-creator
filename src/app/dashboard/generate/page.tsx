@@ -14,6 +14,7 @@ import LiquidChrome from "@/components/bits/liquid-chrome";
 
 export default function GeneratePage() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [productId, setProductId] = useState<string | null>(null);
     const [prompt, setPrompt] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export default function GeneratePage() {
                 },
                 body: JSON.stringify({
                     imageUrl,
+                    productId,
                     prompt,
                 }),
             });
@@ -87,9 +89,13 @@ export default function GeneratePage() {
                                     Upload Product
                                 </h3>
                                 <UploadZone
-                                    onUploadComplete={(url) => setImageUrl(url)}
+                                    onUploadComplete={(url, id) => {
+                                        setImageUrl(url);
+                                        setProductId(id || null);
+                                    }}
                                     onClear={() => {
                                         setImageUrl(null);
+                                        setProductId(null);
                                         setGeneratedImage(null);
                                     }}
                                 />

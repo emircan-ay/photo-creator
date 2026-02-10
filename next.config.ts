@@ -17,11 +17,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Higher level package-lock.json issues
   experimental: {
-    turbo: {
-      root: __dirname,
-    }
+    // try different structure
+  } as any,
+  turbopack: {
+    root: ".",
   } as any,
 };
 

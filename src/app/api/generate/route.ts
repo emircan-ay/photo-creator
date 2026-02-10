@@ -16,11 +16,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let imageUrl, prompt;
+    let imageUrl, prompt, productId;
     try {
         const body = await request.json();
         imageUrl = body.imageUrl;
         prompt = body.prompt;
+        productId = body.productId;
     } catch (e) {
         return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
@@ -73,19 +74,28 @@ export async function POST(request: Request) {
             }
         );
 
-        // 2. Deduct credit if successful
-        const { error: updateError } = await supabase
+        // Deduct 1 credit
+        await supabase
             .from("profiles")
             .update({ credits: profile.credits - 1 })
             .eq("id", user.id);
 
-        if (updateError) {
-            console.error("Failed to deduct credit:", updateError);
-            // We still return the image, but maybe log this for manual fix
-        }
+        // Save to Generations table
+        const generatedImageUrl = Array.isArray(output) ? output[0] : output;
 
-        // Output is usually an array of strings (URLs)
-        return NextResponse.json({ result: output, remainingCredits: profile.credits - 1 });
+        await supabase.from("generations").insert({
+            user_id: user.id,
+            product_id: productId,
+            prompt: prompt,
+            image_url: generatedImageUrl,
+            model_used: "SDXL",
+            status: "completed"
+        });
+
+        return NextResponse.json({
+            result: Array.isArray(output) ? output : [output],
+            remainingCredits: profile.credits - 1
+        });
     } catch (error) {
         console.error("Generation error:", error);
         return NextResponse.json(

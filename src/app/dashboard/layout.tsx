@@ -1,7 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { UserNav } from "@/components/user-nav"; // Need to create this
-import { MainNav } from "@/components/main-nav"; // Need to create this
+import { UserNav } from "@/components/user-nav";
+import { MainNav } from "@/components/main-nav";
+import { Sparkles } from "lucide-react";
 
 export default async function DashboardLayout({
     children,
@@ -18,16 +19,24 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="flex-col md:flex">
-            <div className="border-b">
-                <div className="flex h-16 items-center px-4">
-                    <MainNav className="mx-6" />
-                    <div className="ml-auto flex items-center space-x-4">
+        <div className="flex min-h-screen flex-col bg-background/50">
+            <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl">
+                <div className="container max-w-7xl mx-auto flex h-20 items-center px-6">
+                    <MainNav />
+                    <div className="ml-auto flex items-center gap-4">
+                        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10 text-xs font-bold text-primary">
+                            <Sparkles className="h-3 w-3" />
+                            Studio Mode Active
+                        </div>
                         <UserNav user={user} />
                     </div>
                 </div>
-            </div>
-            <div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
+            </header>
+            <main className="flex-1">
+                <div className="container max-w-7xl mx-auto py-10 px-6">
+                    {children}
+                </div>
+            </main>
         </div>
     );
 }

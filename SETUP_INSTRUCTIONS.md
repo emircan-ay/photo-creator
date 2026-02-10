@@ -93,4 +93,22 @@ create policy "Users can view all images"
 on storage.objects for select to public using (bucket_id = 'products');
 ```
 
+## 4. Disable Email Confirmation (CRITICAL for Testing)
+To avoid "Email Rate Limit Exceeded" errors and allow instant login:
+1. Go to **Authentication** -> **Providers** -> **Email**.
+2. Toggle **Confirm Email** to **OFF**.
+3. Click **Save**.
+
+Now you can register and login instantly without waiting for an email!
+
+---
+
 Once these steps are done, **Sign Up** in the app and try generating an image!
+
+## Environmental Variables Check
+Make sure your `.env.local` includes:
+1. `NEXT_PUBLIC_SUPABASE_URL`
+2. `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. `REPLICATE_API_TOKEN`
+4. `APIFY_API_TOKEN`
+5. `RESEND_API_KEY`

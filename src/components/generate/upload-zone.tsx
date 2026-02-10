@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 interface UploadZoneProps {
-    onUploadComplete: (url: string) => void;
+    onUploadComplete: (url: string, productId?: string) => void;
     onClear: () => void;
 }
 
@@ -76,7 +76,29 @@ export function UploadZone({ onUploadComplete, onClear }: UploadZoneProps) {
                 .from("products")
                 .getPublicUrl(fileName);
 
-            onUploadComplete(publicUrlData.publicUrl);
+            const publicUrl = publicUrlData.publicUrl;
+
+            // Save to products table
+            const { data: { user } } = await supabase.auth.getUser();
+            let productId = undefined;
+
+            if (user) {
+                const { data: productData, error: dbError } = await supabase
+                    .from("products")
+                    .insert({
+                        user_id: user.id,
+                        name: file.name,
+                        original_image_url: publicUrl,
+                    })
+                    .select()
+                    .single();
+
+                if (!dbError && productData) {
+                    productId = productData.id;
+                }
+            }
+
+            onUploadComplete(publicUrl, productId);
             toast.success("Image uploaded successfully");
         } catch (error) {
             console.error("Upload error:", error);
